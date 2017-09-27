@@ -384,6 +384,7 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
       this.props.viewabilityConfig,
     );
     this.state = {
+    initialScrollDone: false,
       first: this.props.initialScrollIndex || 0,
       last:
         Math.min(
@@ -392,20 +393,6 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
         ) - 1,
     };
   }
-
-  componentDidMount() {
-    if (this.props.initialScrollIndex) {
-      this._initialScrollIndexTimeout = setTimeout(
-        () =>
-          this.scrollToIndex({
-            animated: false,
-            index: this.props.initialScrollIndex,
-          }),
-        0,
-      );
-    }
-  }
-
   componentWillUnmount() {
     this._updateViewableItems(null);
     this._updateCellsToRenderBatcher.dispose();
@@ -418,6 +405,18 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
     const {data, extraData, getItemCount, maxToRenderPerBatch} = newProps;
     // first and last could be stale (e.g. if a new, shorter items props is passed in), so we make
     // sure we're rendering a reasonable range here.
+
+  if (!this.state.initialScrollDone && getItemCount(data) > 0 && this.props.initialScrollIndex) {
+    this._initialScrollIndexTimeout = setTimeout(
+      () => {
+        this.setState({initialScrollDone: true});
+        this.scrollToIndex({
+          animated: false,
+          index: this.props.initialScrollIndex,
+        });
+      }, 0);
+  }
+
     this.setState({
       first: Math.max(
         0,
@@ -426,7 +425,7 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
           getItemCount(data) - 1 - maxToRenderPerBatch,
         ),
       ),
-      last: Math.max(0, Math.min(this.state.last, getItemCount(data) - 1)),
+    last: Math.max(0, (Math.min(newProps.getItemCount(newProps.data), (newProps.initialScrollIndex || 0) + newProps.initialNumToRender) - 1)),
     });
     if (data !== this.props.data || extraData !== this.props.extraData) {
       this._hasDataChangedSinceEndReached = true;
