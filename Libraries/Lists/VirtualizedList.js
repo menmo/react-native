@@ -216,9 +216,12 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
         this._footerLength -
         this._scrollMetrics.visibleLength,
     );
-    this._scrollRef.scrollTo(
-      this.props.horizontal ? {x: offset, animated} : {y: offset, animated},
-    );
+
+    if(this._scrollRef) {
+      this._scrollRef.scrollTo(
+        this.props.horizontal ? { x: offset, animated } : { y: offset, animated },
+      );
+    }
   }
 
   // scrollToIndex may be janky without getItemLayout prop
@@ -247,9 +250,11 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
           (viewPosition || 0) *
             (this._scrollMetrics.visibleLength - frame.length),
       ) - (viewOffset || 0);
-    this._scrollRef.scrollTo(
-      horizontal ? {x: offset, animated} : {y: offset, animated},
-    );
+    if(this._scrollRef) {
+      this._scrollRef.scrollTo(
+        horizontal ? { x: offset, animated } : { y: offset, animated },
+      );
+    }
   }
 
   // scrollToItem may be janky without getItemLayout prop. Required linear scan through items -
@@ -282,9 +287,11 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
    */
   scrollToOffset(params: {animated?: ?boolean, offset: number}) {
     const {animated, offset} = params;
-    this._scrollRef.scrollTo(
-      this.props.horizontal ? {x: offset, animated} : {y: offset, animated},
-    );
+    if(this._scrollRef) {
+      this._scrollRef.scrollTo(
+        this.props.horizontal ? { x: offset, animated } : { y: offset, animated },
+      );
+    }
   }
 
   recordInteraction() {
@@ -293,7 +300,9 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
   }
 
   flashScrollIndicators() {
-    this._scrollRef.flashScrollIndicators();
+    if(this._scrollRef) {
+      this._scrollRef.flashScrollIndicators();
+    }
   }
 
   /**
